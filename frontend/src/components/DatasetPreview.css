@@ -1,0 +1,38 @@
+/* components/DatasetPreview.css */
+.section-block {
+  margin-bottom: 28px;
+}
+.section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.rows-select {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  outline: none;
+}
+.rows-select:focus { border-color: var(--border-cyan); }
+.row-num-col {
+  width: 44px;
+  text-align: center;
+  color: var(--text-muted) !important;
+}
+.null-cell {
+  color: var(--text-muted);
+  font-style: italic;
+}
+.preview-footer {
+  margin-top: 10px;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  text-align: right;
+}

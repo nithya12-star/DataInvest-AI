@@ -1,0 +1,29 @@
+dataset_name,dataset_path,status,n_rows,n_cols,execution_mode,is_offline_fixture,tasks_executed,initial_findings_count,verified_findings_count,findings_requiring_reinvestigation,findings_revised,findings_unresolved,cochran_violations_count,normality_violations_count,leverage_outlier_violations_count,baseline_score,proposed_score,score_delta,total_experiment_duration_seconds,shared_duration_seconds,planning_duration_seconds,analysis_duration_seconds,baseline_duration_seconds,proposed_duration_seconds,critic_duration_seconds,verification_duration_seconds,proposed_overhead_seconds,error_message
+sample.csv,data/sample.csv,FAILED,60,8,offline_fixture_replay,True,0,0,0,0,0,0,N/A,N/A,N/A,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,"Experiment execution failed: 2 validation errors for SelectedColumn
+column
+  Field required [type=missing, input_value={'column_name': 'age', 'r...data_type': 'numerical'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.14/v/missing
+reason
+  Field required [type=missing, input_value={'column_name': 'age', 'r...data_type': 'numerical'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.14/v/missing"
+student-mat.csv,data/student-mat.csv,FAILED,395,33,offline_fixture_replay,True,0,0,0,0,0,0,N/A,N/A,N/A,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,"Experiment execution failed: 2 validation errors for SelectedColumn
+column
+  Field required [type=missing, input_value={'column_name': 'sex', 'r...ta_type': 'categorical'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.14/v/missing
+reason
+  Field required [type=missing, input_value={'column_name': 'sex', 'r...ta_type': 'categorical'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.14/v/missing"
+winequality-red.csv,data/winequality-red.csv,FAILED,1599,12,offline_fixture_replay,True,0,0,0,0,0,0,N/A,N/A,N/A,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,"Experiment execution failed: 2 validation errors for SelectedColumn
+column
+  Field required [type=missing, input_value={'column_name': 'alcohol'...data_type': 'numerical'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.14/v/missing
+reason
+  Field required [type=missing, input_value={'column_name': 'alcohol'...data_type': 'numerical'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.14/v/missing"
+processed.cleveland.txt,data/processed.cleveland.txt,FAILED,303,14,offline_fixture_replay,True,0,0,0,0,0,0,N/A,N/A,N/A,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,"Experiment execution failed: 2 validation errors for SelectedColumn
+column
+  Field required [type=missing, input_value={'column_name': 'sex', 'r...ta_type': 'categorical'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.14/v/missing
+reason
+  Field required [type=missing, input_value={'column_name': 'sex', 'r...ta_type': 'categorical'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.14/v/missing"

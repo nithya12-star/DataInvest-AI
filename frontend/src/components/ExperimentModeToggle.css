@@ -1,0 +1,149 @@
+/* components/ExperimentModeToggle.css */
+
+.experiment-mode-bar {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  transition: all 0.25s ease;
+}
+
+.mode-bar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mode-bar-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mode-bar-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--primary, #6366f1);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.mode-bar-hint {
+  font-size: 0.82rem;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.mode-delta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  border: 1px solid;
+}
+
+.mode-delta-badge.delta-positive {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #10b981;
+}
+
+.mode-delta-badge.delta-negative {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.mode-toggle-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .mode-toggle-group {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mode-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  text-align: center;
+}
+
+.mode-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-primary, #f8fafc);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.mode-toggle-btn.active {
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.mode-toggle-btn.compare-active {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(139, 92, 246, 0.25));
+  border-color: #818cf8;
+}
+
+.mode-toggle-btn.baseline-active {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(14, 165, 233, 0.25));
+  border-color: #60a5fa;
+}
+
+.mode-toggle-btn.proposed-active {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.25));
+  border-color: #34d399;
+}
+
+.mode-icon {
+  font-size: 1.1rem;
+}
+
+.mode-tag-pill {
+  font-size: 0.72rem;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-secondary, #cbd5e1);
+  font-weight: 500;
+}
+
+.mode-score-badge {
+  font-size: 0.78rem;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.mode-score-badge.proposed-score {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
+}

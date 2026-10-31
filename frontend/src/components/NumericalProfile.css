@@ -1,0 +1,79 @@
+/* components/NumericalProfile.css */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+@media (max-width: 900px) { .stat-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.stat-cell {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+.stat-cell.highlight {
+  border-color: rgba(24,200,255,0.25);
+  background: rgba(24,200,255,0.05);
+}
+.stat-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.stat-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.stat-cell.highlight .stat-value { color: var(--cyan-bright); }
+.no-val { color: var(--text-muted); font-style: italic; }
+
+.outlier-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  margin-bottom: 14px;
+}
+.outlier-summary.has-outliers {
+  background: rgba(245,158,11,.08);
+  border: 1px solid rgba(245,158,11,.2);
+  color: var(--warning);
+}
+.outlier-summary.no-outliers {
+  background: rgba(34,197,94,.08);
+  border: 1px solid rgba(34,197,94,.2);
+  color: var(--success);
+}
+.outlier-icon { font-size: 1rem; }
+
+.all-cols-details {
+  margin-top: 4px;
+}
+.all-cols-details summary {
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  user-select: none;
+  padding: 4px 0;
+}
+.all-cols-details summary:hover { color: var(--cyan-bright); }
+.active-row { background: rgba(24,200,255,0.04) !important; }
+.cell-warning { color: var(--warning) !important; font-weight: 600; }
+.empty-state {
+  padding: 28px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}

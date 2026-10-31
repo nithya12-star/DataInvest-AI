@@ -1,0 +1,44 @@
+/* components/MetricCard.css */
+.metric-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+}
+.metric-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(24,200,255,0.1);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: var(--cyan-bright);
+  flex-shrink: 0;
+}
+.metric-body { min-width: 0; }
+.metric-value {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.metric-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.metric-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+/* Variants */
+.metric-card--warning .metric-icon { background: rgba(245,158,11,.12); color: var(--warning); }
+.metric-card--warning .metric-value { color: var(--warning); }
+.metric-card--error   .metric-icon { background: rgba(239,68,68,.12);  color: var(--error); }
+.metric-card--success .metric-icon { background: rgba(34,197,94,.12);  color: var(--success); }

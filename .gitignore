@@ -1,0 +1,73 @@
+# Environment variables & secrets (CRITICAL)
+.env
+.env.*
+*.env
+backend/.env
+
+# Python byte-code & caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Testing & coverage
+.pytest_cache/
+backend/.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.cache/
+
+# Node & Frontend dependencies
+node_modules/
+dist/
+dist-ssr/
+frontend/dist/
+*.local
+
+# Local backup directories
+_backups_*/
+
+# Large generated run files (>100MB) & iteration logs
+backend/data/logs/
+backend/data/runs/*shopmania*.json
+*.tmp
+*.bak
+*.bak_*
+
+# Historical run files: exclude all runs by default, allow only 20 verified review runs
+backend/data/runs/*.json
+!backend/data/runs/run_20261028_090827_processedclevelandtxt_baseline_249d77.json
+!backend/data/runs/run_20261028_090827_processedclevelandtxt_proposed_249d77.json
+!backend/data/runs/run_20261028_091011_processedclevelandtxt_baseline_cd47de.json
+!backend/data/runs/run_20261028_091011_processedclevelandtxt_proposed_cd47de.json
+!backend/data/runs/run_20261030_064614_heartcsv_baseline_8e372d.json
+!backend/data/runs/run_20261030_064614_heartcsv_proposed_8e372d.json
+!backend/data/runs/run_20261030_133553_heartcsv_baseline_58c9f0.json
+!backend/data/runs/run_20261030_133553_heartcsv_proposed_58c9f0.json
+!backend/data/runs/run_20261030_145219_heartcsv_ffd27c.json
+!backend/data/runs/run_20261030_150326_heartcsv_74a4ae.json
+!backend/data/runs/run_20261031_094844_heartcsv_c27b31.json
+!backend/data/runs/run_20261030_075545_customerscsv_7df0b0.json
+!backend/data/runs/run_20261030_110752_customerscsv_92955d.json
+!backend/data/runs/run_20261023_111033_student_matcsv_78c0a2.json
+!backend/data/runs/run_20261024_080201_student_matcsv_034dc6.json
+!backend/data/runs/run_20261024_081350_student_matcsv_baseline_a81a17.json
+!backend/data/runs/run_20261024_081350_student_matcsv_proposed_a81a17.json
+!backend/data/runs/run_20261025_120202_student_matcsv_baseline_a7c5f5.json
+!backend/data/runs/run_20261025_120202_student_matcsv_proposed_a7c5f5.json
+!backend/data/runs/run_20261026_044040_student_matcsv_a24fa7.json
+
+# IDE & OS metadata
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json

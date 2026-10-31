@@ -1,0 +1,250 @@
+/* components/InvestigationStepper.css — Investigation Journey Stepper */
+
+.stepper-container {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.stepper-scroll-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.stepper-scroll-cue {
+  display: flex;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 38px;
+  background: linear-gradient(90deg, transparent, rgba(11, 19, 41, 0.95) 70%);
+  pointer-events: none;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 6px;
+  border-top-right-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+  color: var(--cyan-bright, #38bdf8);
+  font-size: 1.15rem;
+  font-weight: 700;
+  z-index: 5;
+  animation: pulse-cue 2s infinite ease-in-out;
+}
+
+@keyframes pulse-cue {
+  0%, 100% { opacity: 0.7; transform: translateX(0); }
+  50% { opacity: 1; transform: translateX(2px); }
+}
+
+@media (min-width: 901px) {
+  .stepper-scroll-cue {
+    display: none;
+  }
+}
+
+.stepper-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 8px 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  overflow-x: auto;
+  gap: 4px;
+  scrollbar-width: thin;
+}
+
+.stepper-nav::-webkit-scrollbar {
+  height: 4px;
+}
+
+.stepper-nav::-webkit-scrollbar-thumb {
+  background: var(--border-cyan);
+  border-radius: 2px;
+}
+
+/* Individual Stepper Item */
+.stepper-item {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 130px;
+  position: relative;
+}
+
+/* Stepper Button */
+.stepper-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.stepper-btn:focus-visible {
+  outline: 2px solid var(--cyan-bright);
+  outline-offset: 2px;
+}
+
+/* Step Number / Icon Badge */
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: all var(--transition);
+}
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: hidden;
+}
+
+.step-label {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: inherit;
+}
+
+.step-status-text {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── ACTIVE STATE ──────────────────────────────────────────────────────── */
+.stepper-item.state-active .stepper-btn {
+  background: rgba(0, 191, 255, 0.08);
+  border-color: var(--cyan-bright);
+  color: var(--text-primary);
+  box-shadow: 0 0 16px var(--glow-md), inset 0 0 10px rgba(0, 191, 255, 0.05);
+}
+
+.stepper-item.state-active .step-badge {
+  background: var(--cyan-primary);
+  border-color: var(--cyan-bright);
+  color: #071525;
+  box-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
+}
+
+.stepper-item.state-active .step-status-text {
+  color: var(--cyan-bright);
+  font-weight: 600;
+}
+
+/* ── COMPLETED STATE ───────────────────────────────────────────────────── */
+.stepper-item.state-completed .stepper-btn {
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.stepper-item.state-completed .stepper-btn:hover {
+  background: rgba(34, 197, 94, 0.08);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.stepper-item.state-completed .step-badge {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: var(--success);
+}
+
+.stepper-item.state-completed .step-status-text {
+  color: var(--success);
+}
+
+/* ── READY / UNLOCKED STATE (Next stage waiting to be run) ──────────────── */
+.stepper-item.state-unlocked .stepper-btn {
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.stepper-item.state-unlocked .stepper-btn:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--border-cyan);
+}
+
+.stepper-item.state-unlocked .step-badge {
+  background: rgba(0, 191, 255, 0.1);
+  border-color: var(--border-cyan);
+  color: var(--cyan-bright);
+}
+
+/* ── LOCKED STATE ──────────────────────────────────────────────────────── */
+.stepper-item.state-locked .stepper-btn {
+  opacity: 0.45;
+  cursor: not-allowed;
+  color: var(--text-muted);
+}
+
+.stepper-item.state-locked .step-badge {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+}
+
+/* ── Step Divider Arrow ────────────────────────────────────────────────── */
+.stepper-divider {
+  display: flex;
+  align-items: center;
+  color: var(--border);
+  font-size: 0.8rem;
+  padding: 0 2px;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.stepper-item.state-completed + .stepper-divider {
+  color: rgba(34, 197, 94, 0.4);
+}
+
+.stepper-item.state-active + .stepper-divider {
+  color: var(--border-cyan);
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .stepper-nav {
+    justify-content: flex-start;
+    padding: 6px 8px;
+  }
+
+  .stepper-item {
+    min-width: 120px;
+    flex: 0 0 auto;
+  }
+
+  .stepper-btn {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .step-label {
+    font-size: 0.82rem;
+  }
+}

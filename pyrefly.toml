@@ -1,0 +1,9 @@
+search-path = [
+    "backend",
+    ".",
+]
+
+project-includes = [
+    "**/*.py*",
+    "**/*.ipynb",
+]

@@ -1,0 +1,10 @@
+/* components/ColumnProfile.css */
+.col-name-cell {
+  font-weight: 600;
+  color: var(--text-primary) !important;
+  max-width: 160px;
+}
+.cell-warning { color: var(--warning) !important; font-weight: 600; }
+.flags-cell { display: flex; gap: 4px; flex-wrap: wrap; }
+.badge-type-cat { background: rgba(245,158,11,.1); color: var(--warning); border: 1px solid rgba(245,158,11,.2); }
+.badge-type-dt  { background: rgba(34,197,94,.1);  color: var(--success); border: 1px solid rgba(34,197,94,.2); }

@@ -1,0 +1,128 @@
+/* components/Navbar.css */
+.navbar {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.navbar-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.navbar-logo-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--cyan-primary), var(--cyan-bright));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  box-shadow: 0 0 10px var(--glow-sm);
+}
+.navbar-brand-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+.navbar-brand-name span { color: var(--cyan-bright); }
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.navbar-phase {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-weight: 500;
+}
+
+.btn-history {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  padding: 6px 12px;
+}
+
+.history-count-badge {
+  background: var(--cyan-primary, #06b6d4);
+  color: #000;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 1px 6px;
+  margin-left: 2px;
+}
+
+/* Responsive Breakpoints — Fix Mobile Header Collision */
+@media (max-width: 900px) {
+  .navbar-phase {
+    max-width: 170px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-inner {
+    padding: 0 12px;
+  }
+  .navbar-phase {
+    display: none; /* Hide verbose phase badge on mobile/tablet to eliminate collision with brand */
+  }
+  .navbar-right {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 430px) {
+  .navbar-inner {
+    padding: 0 8px;
+  }
+  .navbar-brand-name {
+    font-size: 0.95rem;
+  }
+  .navbar-logo-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 0.85rem;
+  }
+  .btn-history {
+    padding: 5px 8px;
+    font-size: 0.78rem;
+    gap: 4px;
+  }
+  .navbar-right .btn {
+    padding: 5px 10px;
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .navbar-brand-name {
+    font-size: 0.85rem;
+  }
+  .btn-history span:nth-child(2) {
+    display: none; /* Hide 'History' text on ultra-narrow screens, keep icon + count */
+  }
+}
+

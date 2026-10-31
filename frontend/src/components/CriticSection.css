@@ -1,0 +1,297 @@
+/* components/CriticSection.css — Phase 4 Critic Verification Styling */
+
+.critic-section-container {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.critic-overview-card {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+}
+
+.critic-overview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.critic-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.critic-status-headline {
+  background: rgba(30, 41, 59, 0.6);
+  border-left: 4px solid var(--accent-cyan);
+  padding: 12px 16px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* Statistics distribution row */
+.critic-stat-chips {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.critic-stat-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid var(--border-color);
+}
+
+.critic-stat-chip.chip-accepted {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #34d399;
+}
+
+.critic-stat-chip.chip-questionable {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+}
+
+.critic-stat-chip.chip-rejected {
+  background: rgba(244, 63, 94, 0.12);
+  border-color: rgba(244, 63, 94, 0.35);
+  color: #f87171;
+}
+
+.critic-stat-chip.chip-reinvestigate {
+  background: rgba(14, 165, 233, 0.12);
+  border-color: rgba(14, 165, 233, 0.35);
+  color: var(--accent-cyan);
+}
+
+/* Critic review cards grid */
+.critic-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 900px) {
+  .critic-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.critic-card {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: var(--transition);
+}
+
+.critic-card:hover {
+  border-color: var(--border-hover);
+  background: rgba(15, 23, 42, 0.85);
+}
+
+/* Status variants for cards */
+.critic-card.card-status-accepted {
+  border-left: 3px solid #10b981;
+}
+
+.critic-card.card-status-questionable {
+  border-left: 3px solid #f59e0b;
+}
+
+.critic-card.card-status-rejected {
+  border-left: 3px solid #f43f5e;
+}
+
+.critic-card.card-status-reinvestigate {
+  border-left: 3px solid #0ea5e9;
+}
+
+/* Card Header */
+.critic-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.critic-meta-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.critic-task-id {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(30, 41, 59, 0.8);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.critic-method-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Status Badges */
+.verdict-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.verdict-badge.status-accepted {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.verdict-badge.status-questionable {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.verdict-badge.status-rejected {
+  background: rgba(244, 63, 94, 0.18);
+  color: #f87171;
+  border: 1px solid rgba(244, 63, 94, 0.35);
+}
+
+.verdict-badge.status-reinvestigate {
+  background: rgba(14, 165, 233, 0.18);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(14, 165, 233, 0.35);
+}
+
+/* Scientific Assessment Box */
+.critic-summary-box {
+  background: rgba(30, 41, 59, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
+/* Evidence section */
+.critic-section-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.critic-sub-title {
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.critic-evidence-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.critic-evidence-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  line-height: 1.4;
+}
+
+/* Callout Box for Reinvestigation / Recommendation */
+.reinvestigate-callout {
+  background: rgba(14, 165, 233, 0.08);
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reinvestigate-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.reinvestigate-method-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  background: rgba(14, 165, 233, 0.2);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #38bdf8;
+  width: fit-content;
+}
+
+/* Reason Codes Chips */
+.reason-codes-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.reason-chip {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+}

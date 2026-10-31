@@ -1,0 +1,36 @@
+/* components/Hero.css */
+.hero {
+  padding: 56px 0 40px;
+  text-align: center;
+}
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--cyan-bright);
+  background: rgba(24,200,255,0.08);
+  border: 1px solid rgba(24,200,255,0.18);
+  border-radius: 20px;
+  padding: 4px 14px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.hero-title {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
+.hero-title span { color: var(--cyan-bright); }
+.hero-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.65;
+}

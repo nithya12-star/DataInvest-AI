@@ -1,0 +1,27 @@
+/* components/ErrorState.css */
+.error-state {
+  display: flex;
+  justify-content: center;
+  padding: 60px 24px;
+}
+.error-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 48px 60px;
+  text-align: center;
+  border-color: var(--error) !important;
+  max-width: 460px;
+}
+.error-icon { color: var(--error); }
+.error-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.error-message {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
