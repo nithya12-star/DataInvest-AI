@@ -49,6 +49,21 @@ export default function CriticSection({ criticResponse }) {
     }
   }
 
+  const formatConfidenceLabel = (r) => {
+    const pct = typeof r.confidence === 'number' ? `${(r.confidence * 100).toFixed(0)}%` : '100%'
+    const level = r.confidence_level || 'HIGH'
+    if (r.status === 'REJECTED') {
+      return `Decision Certainty: ${pct} (${level})`
+    }
+    if (r.status === 'REQUIRES_REINVESTIGATION') {
+      return `Review Certainty: ${pct} (${level})`
+    }
+    if (r.status === 'QUESTIONABLE') {
+      return `Confidence: ${pct} (${level})`
+    }
+    return `Finding Confidence: ${pct} (${level})`
+  }
+
   return (
     <div className="critic-section-container fade-in">
       {/* ── Summary & Verdict Overview ────────────────────────────── */}
@@ -161,8 +176,11 @@ export default function CriticSection({ criticResponse }) {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span className={`badge-sig ${r.confidence_level === 'HIGH' ? 'sig-yes' : r.confidence_level === 'MEDIUM' ? 'sig-no' : 'sig-no'}`}>
-                  {r.confidence_level} Confidence ({(r.confidence * 100).toFixed(0)}%)
+                <span
+                  className={`badge-sig ${r.status === 'REJECTED' ? 'sig-no' : r.confidence_level === 'HIGH' ? 'sig-yes' : 'sig-no'}`}
+                  title={r.status === 'REJECTED' ? 'Critic decision certainty in rejecting this finding' : undefined}
+                >
+                  {formatConfidenceLabel(r)}
                 </span>
                 <span className={`verdict-badge ${getStatusBadgeClass(r.status)}`}>
                   {formatStatusLabel(r.status)}

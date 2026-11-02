@@ -33,6 +33,8 @@ export default function CompareExperimentsView({
   experiment,
   onViewBaseline,
   onViewProposed,
+  onDownloadArchive,
+  onExportBranch,
 }) {
   const [showBasePaperModal, setShowBasePaperModal] = useState(false)
 
@@ -115,6 +117,27 @@ export default function CompareExperimentsView({
               : 'Objective not available'}
           </span>
         </div>
+        <div className="verdict-actions-row" style={{ display: 'flex', gap: '10px', marginTop: '14px', flexWrap: 'wrap' }}>
+          {onDownloadArchive && (
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={onDownloadArchive}
+              title="Download complete research archive with Baseline, Proposed, Manifest, and SHA-256 Checksums (.ZIP)"
+              style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', borderColor: '#818cf8', fontWeight: 600 }}
+            >
+              <span>📦 Download Complete Pair Archive (.ZIP)</span>
+            </button>
+          )}
+          <button
+            type="button"
+            className="btn btn-outline btn-sm"
+            onClick={() => setShowBasePaperModal(true)}
+            title="Compare against published benchmarks (Weng et al., 2026)"
+          >
+            📊 Compare with Base Paper
+          </button>
+        </div>
       </div>
 
       {/* 2. Head-to-Head Branch Scorecard */}
@@ -173,6 +196,29 @@ export default function CompareExperimentsView({
               <span>→</span>
             </button>
           )}
+
+          {onExportBranch && (
+            <div style={{ display: 'flex', gap: '6px', marginTop: '10px' }}>
+              <button
+                type="button"
+                className="btn btn-outline btn-sm"
+                style={{ flex: 1, fontSize: '0.75rem', padding: '4px 6px' }}
+                onClick={() => onExportBranch('baseline', 'markdown')}
+                title="Download Baseline Markdown report"
+              >
+                📥 Baseline .MD
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline btn-sm"
+                style={{ flex: 1, fontSize: '0.75rem', padding: '4px 6px' }}
+                onClick={() => onExportBranch('baseline', 'json')}
+                title="Download Baseline JSON data"
+              >
+                { } Baseline JSON
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Proposed Card */}
@@ -228,6 +274,29 @@ export default function CompareExperimentsView({
               <span>Inspect Proposed Pipeline</span>
               <span>→</span>
             </button>
+          )}
+
+          {onExportBranch && (
+            <div style={{ display: 'flex', gap: '6px', marginTop: '10px' }}>
+              <button
+                type="button"
+                className="btn btn-outline btn-sm"
+                style={{ flex: 1, fontSize: '0.75rem', padding: '4px 6px' }}
+                onClick={() => onExportBranch('proposed', 'markdown')}
+                title="Download Proposed Markdown report"
+              >
+                📥 Proposed .MD
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline btn-sm"
+                style={{ flex: 1, fontSize: '0.75rem', padding: '4px 6px' }}
+                onClick={() => onExportBranch('proposed', 'json')}
+                title="Download Proposed JSON data"
+              >
+                { } Proposed JSON
+              </button>
+            </div>
           )}
         </div>
       </div>

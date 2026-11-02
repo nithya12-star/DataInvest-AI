@@ -200,11 +200,38 @@ def test_api_runs_endpoints():
     assert run_data["run_id"] == run_id
     assert run_data["profile"]["overview"]["n_rows"] == 50
 
+    # 3b. Verify export endpoints succeed for saved run
+    exp_md = client.get(f"/api/runs/{run_id}/export/markdown")
+    assert exp_md.status_code == 200
+    assert "attachment" in exp_md.headers.get("content-disposition", "")
+    assert len(exp_md.text) > 0
+
+    exp_json = client.get(f"/api/runs/{run_id}/export/json")
+    assert exp_json.status_code == 200
+    assert "attachment" in exp_json.headers.get("content-disposition", "")
+    json_data = exp_json.json()
+    assert json_data.get("run_id") == run_id
+
+    # 3c. Verify logger received valid run_id and recorded RUN_SAVED event
+    logs_resp = client.get(f"/api/runs/{run_id}/logs")
+    assert logs_resp.status_code == 200
+    logs_data = logs_resp.json()
+    assert logs_data["total_events"] >= 1
+    assert any(e.get("event_type") == "RUN_SAVED" for e in logs_data["events"])
+
     # 4. Delete run
     del_resp = client.delete(f"/api/runs/{run_id}")
     assert del_resp.status_code == 200
     assert del_resp.json()["status"] == "deleted"
 
-    # 5. Verify 404 after deletion
+    # 5. Verify 404 after deletion across run retrieval and export endpoints
     get_again = client.get(f"/api/runs/{run_id}")
     assert get_again.status_code == 404
+
+    exp_md_missing = client.get(f"/api/runs/{run_id}/export/markdown")
+    assert exp_md_missing.status_code == 404
+    assert "not found" in exp_md_missing.json().get("error", "").lower()
+
+    exp_json_missing = client.get(f"/api/runs/{run_id}/export/json")
+    assert exp_json_missing.status_code == 404
+    assert "not found" in exp_json_missing.json().get("error", "").lower()

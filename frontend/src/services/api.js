@@ -423,6 +423,9 @@ export async function downloadRunExport(runId, format = 'markdown') {
       const errData = await response.json()
       if (errData?.error) errMessage = errData.error
     } catch (_) {}
+    if (response.status === 404 && !errMessage.includes('restart')) {
+      errMessage += ' (Run record not found on backend storage. On free-tier cloud deployments, dynamically created runs expire upon container restart).'
+    }
     throw new Error(errMessage)
   }
 
@@ -516,3 +519,12 @@ export async function fetchAllDatasetsBenchmark() {
 export function getBenchmarkFigureUrl(figName) {
   return `${BASE_URL}/benchmarks/figure/${figName}`
 }
+
+// Re-export client-side research archive & export utilities
+export {
+  exportRunDirectly,
+  exportPairArchive,
+  generateRunMarkdown,
+  createZipArchive,
+  computeSha256,
+} from './researchArchive.js'

@@ -18,7 +18,7 @@ _STORE_LOCK = threading.Lock()
 _DATASET_CACHE: dict[str, pd.DataFrame] = {}
 _MAX_CACHE_SIZE = 50
 
-SUPPORTED_DATASET_EXTENSIONS = {".csv", ".txt", ".data", ".tsv"}
+SUPPORTED_DATASET_EXTENSIONS = {".csv", ".txt", ".data", ".tsv", ".xlsx"}
 
 
 def store_dataset(dataset_id: str, df: pd.DataFrame) -> str:
@@ -49,7 +49,7 @@ def get_dataset(dataset_id: str) -> Optional[pd.DataFrame]:
     return None
 
 
-def _load_from_absolute_path(path_str: str) -> pd.DataFrame:
+def _load_from_absolute_path(path_str: str, sheet_name: Optional[str] = None) -> pd.DataFrame:
     """
     Safely load a dataset from an explicitly supplied absolute path.
     Validates file existence, regular file status, and supported tabular extension.
@@ -80,6 +80,13 @@ def _load_from_absolute_path(path_str: str) -> pd.DataFrame:
     except Exception as exc:
         raise IOError(f"Failed to read dataset file at '{path_str}': {exc}") from exc
 
+    if suffix == ".xlsx":
+        parsed_df, parse_err = upload_service.parse_xlsx(content, filename=p.name, sheet_name=sheet_name)
+        if parsed_df is not None and not parsed_df.empty:
+            return parsed_df
+        error_msg = parse_err or "File appears empty or could not be parsed as an Excel workbook."
+        raise ValueError(f"Failed to parse dataset from '{path_str}': {error_msg}")
+
     parsed_df, parse_err = upload_service.parse_csv(content, filename=p.name)
     if parsed_df is not None and not parsed_df.empty:
         return parsed_df
@@ -97,10 +104,12 @@ def _load_from_absolute_path(path_str: str) -> pd.DataFrame:
     raise ValueError(f"Failed to parse dataset from '{path_str}': {error_msg}")
 
 
-def resolve_dataset(dataset_id: Optional[str] = None) -> Optional[pd.DataFrame]:
+def resolve_dataset(dataset_id: Optional[str] = None, sheet_name: Optional[str] = None) -> Optional[pd.DataFrame]:
     """
     Resolve dataset by ID from cache, explicit absolute path, or local data directory fallback.
+    Supports optional sheet_name selection for multi-sheet Excel workbooks.
     """
+    cache_key = f"{dataset_id}::{sheet_name}" if (dataset_id and sheet_name) else (dataset_id or "")
     if not dataset_id:
         with _STORE_LOCK:
             if _DATASET_CACHE:
@@ -111,40 +120,43 @@ def resolve_dataset(dataset_id: Optional[str] = None) -> Optional[pd.DataFrame]:
         return _load_from_disk("sample.csv")
 
     # 1. Try cache
-    cached = get_dataset(dataset_id)
+    cached = get_dataset(cache_key)
+    if cached is None:
+        cached = get_dataset(dataset_id)
     if cached is not None:
         return cached
 
     # 2. Check if dataset_id is an explicit absolute path
     if os.path.isabs(dataset_id):
-        df = _load_from_absolute_path(dataset_id)
+        df = _load_from_absolute_path(dataset_id, sheet_name=sheet_name)
         with _STORE_LOCK:
-            _DATASET_CACHE[dataset_id] = df.copy(deep=True)
+            _DATASET_CACHE[cache_key] = df.copy(deep=True)
         return df
 
     # 3. Try standard project disk directories
-    df = _load_from_disk(dataset_id)
+    df = _load_from_disk(dataset_id, sheet_name=sheet_name)
     if df is not None:
         # Cache recovered dataset
         with _STORE_LOCK:
-            _DATASET_CACHE[dataset_id] = df.copy(deep=True)
+            _DATASET_CACHE[cache_key] = df.copy(deep=True)
         return df
 
     return None
 
 
-def _load_from_disk(filename: str) -> Optional[pd.DataFrame]:
+def _load_from_disk(filename: str, sheet_name: Optional[str] = None) -> Optional[pd.DataFrame]:
     """
     Load dataset from standard project data directories.
     Uses upload_service.parse_csv for robust delimiter detection,
     headerless benchmark schemas, and multi-encoding resilience.
+    Routes .xlsx workbooks directly to upload_service.parse_xlsx.
     """
     from app.services import upload_service
 
     clean_name = os.path.basename(filename)
     names_to_try = [clean_name]
     if "." not in clean_name:
-        names_to_try.extend([f"{clean_name}.csv", f"{clean_name}.txt"])
+        names_to_try.extend([f"{clean_name}.csv", f"{clean_name}.txt", f"{clean_name}.xlsx"])
 
     dir_candidates = [
         "data",
@@ -154,24 +166,29 @@ def _load_from_disk(filename: str) -> Optional[pd.DataFrame]:
     ]
 
     for target_name in names_to_try:
+        target_ext = os.path.splitext(target_name)[1].lower()
         for base_dir in dir_candidates:
             path = os.path.join(base_dir, target_name)
             if os.path.exists(path) and os.path.isfile(path):
                 try:
                     with open(path, "rb") as f:
                         content = f.read()
-                    parsed_df, parse_err = upload_service.parse_csv(content, filename=target_name)
+                    if target_ext == ".xlsx":
+                        parsed_df, parse_err = upload_service.parse_xlsx(content, filename=target_name, sheet_name=sheet_name)
+                    else:
+                        parsed_df, parse_err = upload_service.parse_csv(content, filename=target_name)
                     if parsed_df is not None and not parsed_df.empty:
                         return parsed_df
                 except Exception:
                     pass
-                # Secondary fallback: standard pd.read_csv
-                try:
-                    df = pd.read_csv(path)
-                    if df is not None and not df.empty:
-                        return df
-                except Exception:
-                    continue
+                if target_ext != ".xlsx":
+                    # Secondary fallback: standard pd.read_csv for text/csv files
+                    try:
+                        df = pd.read_csv(path)
+                        if df is not None and not df.empty:
+                            return df
+                    except Exception:
+                        continue
 
     return None
 

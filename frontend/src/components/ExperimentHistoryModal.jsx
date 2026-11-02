@@ -1,6 +1,6 @@
 // frontend/src/components/ExperimentHistoryModal.jsx — Experiment Run Repository UI
 import { useState } from 'react'
-import { downloadRunExport } from '../services/api'
+import { downloadRunExport, exportRunDirectly } from '../services/api'
 import './ExperimentHistoryModal.css'
 
 export default function ExperimentHistoryModal({
@@ -8,6 +8,7 @@ export default function ExperimentHistoryModal({
   onClose,
   runs = [],
   activeRunId = null,
+  activeRunData = null,
   onOpenRun,
   onDeleteRun,
   onNewUpload,
@@ -45,7 +46,12 @@ export default function ExperimentHistoryModal({
     setExportingId(`${runId}_${format}`)
     setExportError('')
     try {
-      await downloadRunExport(runId, format)
+      // If the selected run matches the active run data held in memory, export directly
+      if (activeRunData && (activeRunData.run_id === runId || runId === activeRunId)) {
+        await exportRunDirectly(activeRunData, format)
+      } else {
+        await downloadRunExport(runId, format)
+      }
     } catch (err) {
       setExportError(err.message || `Failed to export ${format}`)
       console.error('Export error:', err)

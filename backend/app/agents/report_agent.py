@@ -563,12 +563,18 @@ class ReportAgent:
             lines.append("_No Critic verification reviews were recorded for this run._")
             lines.append("")
         else:
-            lines.append("| Task ID | Verdict | Confidence | Decision Codes | Core Assessment |")
+            lines.append("| Task ID | Verdict | Evaluation Certainty | Decision Codes | Core Assessment |")
             lines.append("|:---|:---|:---|:---|:---|")
             for cv in report.critic_verdicts:
                 codes_str = ", ".join(cv.reason_codes[:3]) if cv.reason_codes else "NONE"
+                if cv.status == "REJECTED":
+                    certainty_label = f"{cv.confidence:.2f} ({cv.confidence_level} Decision Certainty)"
+                elif cv.status == "REQUIRES_REINVESTIGATION":
+                    certainty_label = f"{cv.confidence:.2f} ({cv.confidence_level} Review Certainty)"
+                else:
+                    certainty_label = f"{cv.confidence:.2f} ({cv.confidence_level})"
                 lines.append(
-                    f"| `{cv.task_id}` | **`{cv.status}`** | `{cv.confidence:.2f}` ({cv.confidence_level}) | `{codes_str}` | {cv.summary} |"
+                    f"| `{cv.task_id}` | **`{cv.status}`** | `{certainty_label}` | `{codes_str}` | {cv.summary} |"
                 )
             lines.append("")
 

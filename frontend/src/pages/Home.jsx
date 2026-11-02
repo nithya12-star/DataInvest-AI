@@ -28,7 +28,9 @@ import {
   runPairedExperiment,
   fetchRunById,
   downloadRunExport,
-  runOfflineDemo,
+  deleteRunById,
+  exportRunDirectly,
+  exportPairArchive,
 } from '../services/api'
 
 function fmt(n) {
@@ -62,7 +64,10 @@ export default function Home({
 
   // Stage C Offline Demonstration State
   const [isOfflineDemo, setIsOfflineDemo] = useState(Boolean(initialRunState?.is_offline_demo))
-  const [runningDemo, setRunningDemo] = useState(false)
+  const [demoProfile, setDemoProfile] = useState(initialRunState?.is_offline_demo ? initialRunState.profile : null)
+
+  // Resolve effective profile: when offline demo is active, use synthetic demo profile to prevent desync
+  const activeProfile = (isOfflineDemo && demoProfile) ? demoProfile : profile
 
   // Persistence status state (Requirement 8)
   const [saveStatus, setSaveStatus] = useState('idle') // 'idle' | 'saving' | 'saved' | 'error'
@@ -124,16 +129,25 @@ export default function Home({
 
   // Helper to persist current run progress to backend/data/runs/ (Requirement 1, 8)
   const persistRun = async (overrides = {}) => {
+    const isDemo = Boolean(isOfflineDemo)
     const payload = {
-      run_id: overrides.run_id || activeRunId,
-      dataset_name: profile?.filename || profile?.dataset_id || 'dataset.csv',
-      dataset_id: profile?.dataset_id || profile?.filename || 'sample.csv',
+      run_id: overrides.run_id || activeRunId || (isDemo ? 'run_demo_synthetic_student_data' : null),
+      dataset_name: isDemo
+        ? (activeProfile?.overview?.filename || activeProfile?.filename || 'synthetic_demo_data.csv')
+        : (profile?.filename || profile?.dataset_id || 'dataset.csv'),
+      dataset_id: isDemo
+        ? (activeProfile?.dataset_id || 'synthetic_demo_data.csv')
+        : (profile?.dataset_id || profile?.filename || 'sample.csv'),
       active_phase: overrides.active_phase ?? activePhase,
       objective: overrides.objective ?? objective,
-      mode: overrides.mode !== undefined ? overrides.mode : (initialRunState?.mode || null),
+      mode: isDemo ? 'offline_deterministic_demo' : (overrides.mode !== undefined ? overrides.mode : (initialRunState?.mode || null)),
+      is_offline_demo: isDemo,
+      disclaimer: isDemo
+        ? 'OFFLINE DEMONSTRATION ONLY: Outputs are deterministic and simulated using synthetic test data.'
+        : undefined,
       paired_run_id: overrides.paired_run_id !== undefined ? overrides.paired_run_id : (initialRunState?.paired_run_id || null),
       experiment_id: overrides.experiment_id !== undefined ? overrides.experiment_id : (initialRunState?.experiment_id || null),
-      profile: profile,
+      profile: activeProfile,
       plan: overrides.plan !== undefined ? overrides.plan : plan,
       analysis: overrides.analysis !== undefined ? overrides.analysis : analysisResponse,
       critic: overrides.critic !== undefined ? overrides.critic : criticResponse,
@@ -212,6 +226,8 @@ export default function Home({
     try {
       const planRes = await createInvestigationPlan(profile, objective, planOptions)
       setPlan(planRes)
+      setIsOfflineDemo(false)
+      setDemoProfile(null)
       await persistRun({ plan: planRes, active_phase: 2 })
     } catch (err) {
       setPlanError(err.message || 'Unable to create an investigation plan.')
@@ -521,18 +537,107 @@ export default function Home({
     }
   }
 
-  // Export current active run
-  const handleExportRun = async (format) => {
-    if (!activeRunId) return
+  // Assemble complete run payload for active state currently held in memory
+  const getActiveInMemoryRunData = () => {
+    if (resultView === 'baseline' && cachedBranchRuns.baseline) {
+      return cachedBranchRuns.baseline
+    }
+    if (resultView === 'proposed' && cachedBranchRuns.proposed) {
+      return cachedBranchRuns.proposed
+    }
+    if (initialRunState && (initialRunState.run_id === activeRunId || !activeRunId)) {
+      return initialRunState
+    }
+    if (activeProfile && (plan || analysisResponse)) {
+      const isDemo = Boolean(isOfflineDemo)
+      return {
+        run_id: activeRunId || (isDemo ? 'run_demo_synthetic_student_data' : `run_${Date.now()}`),
+        mode: isDemo ? 'offline_deterministic_demo' : (resultView === 'baseline' ? 'baseline' : 'proposed'),
+        is_offline_demo: isDemo,
+        disclaimer: isDemo
+          ? 'OFFLINE DEMONSTRATION ONLY: Outputs are deterministic and simulated using synthetic test data.'
+          : undefined,
+        dataset_name: isDemo
+          ? (activeProfile.overview?.filename || activeProfile.filename || 'synthetic_demo_data.csv')
+          : (profile.overview?.filename || profile.filename || profile.dataset_id || 'dataset.csv'),
+        dataset_id: isDemo
+          ? (activeProfile.dataset_id || 'synthetic_demo_data.csv')
+          : (profile.dataset_id || profile.overview?.filename || 'dataset.csv'),
+        created_at: new Date().toISOString(),
+        active_phase: activePhase,
+        completed_phases: completedPhases,
+        objective: objective || 'Investigate this dataset.',
+        profile: activeProfile,
+        plan,
+        analysis: analysisResponse,
+        critic: criticResponse,
+        verification: verificationResponse,
+        insights: insightsResponse,
+        evaluation: evaluationResponse,
+      }
+    }
+    return null
+  }
+
+  // Export current active run (direct client-side when in memory, backend fallback if only ID is present)
+  const handleExportRun = async (format, specificRunData = null) => {
     setExportingFormat(format)
     setExportError('')
     try {
-      await downloadRunExport(activeRunId, format)
+      const inMemoryData = specificRunData || getActiveInMemoryRunData()
+      if (inMemoryData) {
+        await exportRunDirectly(inMemoryData, format)
+      } else if (activeRunId) {
+        await downloadRunExport(activeRunId, format)
+      } else {
+        throw new Error('No run data available to export.')
+      }
     } catch (err) {
       setExportError(err.message || `Failed to export ${format}`)
       console.error('Export error:', err)
     } finally {
       setExportingFormat(null)
+    }
+  }
+
+  // Download complete research archive (.ZIP) with baseline, proposed, manifest, and SHA-256 checksums
+  const handleDownloadPairArchive = async () => {
+    if (!pairedExperiment) return
+    setExportingFormat('archive')
+    setExportError('')
+    try {
+      await exportPairArchive({
+        pairedExperiment,
+        baselineRun: cachedBranchRuns.baseline,
+        proposedRun: cachedBranchRuns.proposed,
+      })
+    } catch (err) {
+      setExportError(err.message || 'Failed to generate research archive.')
+      console.error('Pair archive error:', err)
+    } finally {
+      setExportingFormat(null)
+    }
+  }
+
+  // Export individual branch from comparative view
+  const handleExportBranch = async (mode, format) => {
+    const branchRun = mode === 'baseline' ? cachedBranchRuns.baseline : cachedBranchRuns.proposed
+    if (branchRun) {
+      await handleExportRun(format, branchRun)
+    } else {
+      const branchId =
+        mode === 'baseline' ? pairedExperiment?.baseline?.run_id : pairedExperiment?.proposed?.run_id
+      if (branchId) {
+        setExportingFormat(`${mode}_${format}`)
+        setExportError('')
+        try {
+          await downloadRunExport(branchId, format)
+        } catch (err) {
+          setExportError(err.message || `Failed to export ${mode} run`)
+        } finally {
+          setExportingFormat(null)
+        }
+      }
     }
   }
 
@@ -542,6 +647,17 @@ export default function Home({
 
     setRunningPaired(true)
     setPairedError('')
+
+    // If an initial bare upload draft run was created before launching the comparative experiment,
+    // clean it up so only the matched Baseline and Proposed runs appear in History.
+    // Crucial: Must NEVER delete runs restored from history (initialRunState must be absent).
+    const previousDraftRunId = activeRunId
+    const isBareUploadDraft = Boolean(
+      !initialRunState &&
+      previousDraftRunId &&
+      !plan &&
+      !analysisResponse
+    )
 
     try {
       const datasetId = profile?.dataset_id || profile?.filename || 'sample.csv'
@@ -553,6 +669,16 @@ export default function Home({
         persistRuns: true,
       })
 
+      if (isBareUploadDraft) {
+        try {
+          await deleteRunById(previousDraftRunId)
+        } catch (cleanupErr) {
+          console.warn('Could not clean up temporary upload draft run:', cleanupErr)
+        }
+      }
+
+      setIsOfflineDemo(false)
+      setDemoProfile(null)
       setPairedExperiment(response)
       setResultView('compare')
 
@@ -580,7 +706,7 @@ export default function Home({
   }
 
   const activePhaseInfo = getPhaseById(activePhase)
-  const { overview, missing, duplicates } = profile || {}
+  const { overview, missing, duplicates } = activeProfile || {}
   const missingVariant =
     missing?.total_missing === 0
       ? 'success'
@@ -588,28 +714,6 @@ export default function Home({
       ? 'warning'
       : 'error'
   const dupVariant = duplicates?.n_duplicates === 0 ? 'success' : 'warning'
-
-  const handleRunOfflineDemo = async () => {
-    try {
-      setRunningDemo(true)
-      const demoData = await runOfflineDemo()
-      setObjective(demoData.objective)
-      setPlan(demoData.plan)
-      setAnalysisResponse(demoData.analysis)
-      setCriticResponse(demoData.critic)
-      setVerificationResponse(demoData.verification)
-      setInsightsResponse(demoData.insights)
-      setEvaluationResponse(demoData.evaluation)
-      setIsOfflineDemo(true)
-      setResultView('single')
-      changePhase(7)
-    } catch (err) {
-      console.error('Failed to run offline demo:', err)
-      alert(err.message || 'Offline demo execution failed.')
-    } finally {
-      setRunningDemo(false)
-    }
-  }
 
   return (
     <div className="home fade-in">
@@ -653,39 +757,24 @@ export default function Home({
             </div>
           )}
         </div>
-        <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center' }}>
-          {activeRunId && (
-            <>
-              <button
-                type="button"
-                className="btn btn-outline btn-sm"
-                onClick={() => handleExportRun('markdown')}
-                disabled={exportingFormat === 'markdown'}
-                title="Download complete Markdown research report for this run"
-              >
-                {exportingFormat === 'markdown' ? '...' : '📥 Export .MD'}
-              </button>
-              <button
-                type="button"
-                className="btn btn-outline btn-sm"
-                onClick={() => handleExportRun('json')}
-                disabled={exportingFormat === 'json'}
-                title="Download structured JSON run state & report"
-              >
-                {exportingFormat === 'json' ? '...' : '{ } Export JSON'}
-              </button>
-            </>
+        <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+          {pairedExperiment && (
+            <button
+              type="button"
+              className="btn btn-outline btn-sm"
+              onClick={handleDownloadPairArchive}
+              disabled={exportingFormat === 'archive'}
+              title="Download complete research archive with Baseline, Proposed, Manifest, and SHA-256 Checksums (.ZIP)"
+              style={{
+                borderColor: 'rgba(99, 102, 241, 0.6)',
+                color: '#a5b4fc',
+                background: 'rgba(99, 102, 241, 0.12)',
+                fontWeight: 600,
+              }}
+            >
+              {exportingFormat === 'archive' ? 'Building .ZIP...' : '📦 Research Archive (.ZIP)'}
+            </button>
           )}
-          <button
-            type="button"
-            className="btn btn-outline btn-sm"
-            onClick={handleRunOfflineDemo}
-            disabled={runningDemo}
-            title="Execute 100% offline demonstration using synthetic data without LLM API calls"
-            style={{ borderColor: 'rgba(56, 189, 248, 0.4)', color: '#38bdf8' }}
-          >
-            {runningDemo ? 'Running Demo...' : '⚡ Offline Demo'}
-          </button>
           <button
             type="button"
             className="btn btn-outline btn-sm"
@@ -876,13 +965,15 @@ export default function Home({
           experiment={pairedExperiment}
           onViewBaseline={() => handleChangeResultView('baseline')}
           onViewProposed={() => handleChangeResultView('proposed')}
+          onDownloadArchive={handleDownloadPairArchive}
+          onExportBranch={handleExportBranch}
         />
       ) : (
         <>
           {/* ── Compact Completed Phase Summaries ──────────────────── */}
           <CompletedPhaseSummary
             currentPhase={activePhase}
-            profile={profile}
+            profile={activeProfile}
             plan={plan}
             analysisResponse={analysisResponse}
             criticResponse={criticResponse}
@@ -924,22 +1015,22 @@ export default function Home({
           <div className="dashboard-layout">
             <div className="dash-left">
               <div className="card card-no-hover section-card">
-                <DataQuality profile={profile} />
+                <DataQuality profile={activeProfile} />
               </div>
               <div className="card card-no-hover section-card">
-                <NumericalProfile profile={profile} />
+                <NumericalProfile profile={activeProfile} />
               </div>
             </div>
             <div className="dash-right">
               <div className="card card-no-hover section-card">
-                <ColumnProfile profile={profile} />
+                <ColumnProfile profile={activeProfile} />
               </div>
             </div>
           </div>
 
           {/* Dataset Preview */}
           <div className="card card-no-hover section-card">
-            <DatasetPreview profile={profile} />
+            <DatasetPreview profile={activeProfile} />
           </div>
 
           {/* Bottom Call-to-Action to Proceed to Phase 2 */}

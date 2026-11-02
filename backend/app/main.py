@@ -36,7 +36,7 @@ from dotenv import load_dotenv
 _BACKEND_ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
 load_dotenv(dotenv_path=_BACKEND_ENV_PATH)
 
-from fastapi import FastAPI, File, UploadFile, Request
+from fastapi import FastAPI, File, UploadFile, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, FileResponse
 
@@ -129,6 +129,7 @@ def get_cors_origins() -> list[str]:
         "http://localhost:3000",
         "http://127.0.0.1:5173",
         "http://127.0.0.1:3000",
+        "https://data-invest-ai.vercel.app",
     ]
     env_origins = os.environ.get("CORS_ORIGINS", "")
     origins = list(default_origins)
@@ -225,7 +226,10 @@ async def health():
     },
     tags=["Profiler"],
 )
-async def profile_dataset(file: UploadFile = File(...)):
+async def profile_dataset(
+    file: UploadFile = File(...),
+    sheet_name: Optional[str] = Query(None, description="Optional worksheet name for multi-sheet Excel workbooks"),
+):
     """
     Accept an uploaded CSV file, run the deterministic Pandas/NumPy profiler,
     store the dataset in the in-memory cache, and return structured profiling data.
@@ -237,11 +241,11 @@ async def profile_dataset(file: UploadFile = File(...)):
 
     # 1. Validate file extension
     filename = file.filename or "uploaded_dataset.csv"
-    allowed_exts = (".csv", ".txt")
+    allowed_exts = (".csv", ".txt", ".xlsx")
     if not any(filename.lower().endswith(ext) for ext in allowed_exts):
         return JSONResponse(
             status_code=422,
-            content={"error": "Only CSV and TXT tabular files are supported. Please upload a .csv or .txt file."},
+            content={"error": "Only CSV and TXT tabular files are supported (XLSX also supported). Please upload a .csv, .txt, or .xlsx file."},
         )
 
     # 2. Read file content safely
@@ -254,7 +258,7 @@ async def profile_dataset(file: UploadFile = File(...)):
         )
 
     # 3. Parse CSV into DataFrame with multi-encoding support
-    df, parse_error = upload_service.parse_csv(content, filename=filename)
+    df, parse_error = upload_service.parse_csv(content, filename=filename, sheet_name=sheet_name)
     if parse_error:
         return JSONResponse(status_code=422, content={"error": parse_error})
 
@@ -655,9 +659,10 @@ async def save_experiment_run(payload: RunPayload):
     """Save or update an experiment run with unique ID and complete pipeline state."""
     try:
         result = run_store.save_run(payload.model_dump())
+        saved_run_id = result.get("run_id") or payload.run_id
         try:
             experiment_logger.log_event(
-                run_id=payload.run_id,
+                run_id=saved_run_id,
                 event_type="RUN_SAVED",
                 outcome="SUCCESS",
                 details={

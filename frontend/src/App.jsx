@@ -148,6 +148,7 @@ export default function App() {
         onClose={() => setIsHistoryOpen(false)}
         runs={runs}
         activeRunId={currentRunId}
+        activeRunData={initialRunState}
         onOpenRun={handleOpenRun}
         onDeleteRun={handleDeleteRun}
         onNewUpload={handleReset}
